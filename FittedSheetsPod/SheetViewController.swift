@@ -75,6 +75,8 @@ public class SheetViewController: UIViewController {
     public var didDismiss: ((SheetViewController) -> Void)?
     
     // MARK: - Private properties
+    /// The pan gesture dismiss
+    private var isPanDismiss: Bool = false
     /// The current preferred container size
     private var containerSize: SheetSize = .fixed(300)
     /// The current actual container size
@@ -306,6 +308,7 @@ public class SheetViewController: UIViewController {
     
     @objc func dismissTapped() {
         guard dismissOnBackgroundTap else { return }
+        isPanDismiss = true
         self.closeSheet()
     }
     
@@ -320,10 +323,18 @@ public class SheetViewController: UIViewController {
     }
     
     override public func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
-        self.willDismiss?(self)
-        super.dismiss(animated: flag) {
-            self.didDismiss?(self)
-            completion?()
+        if isPanDismiss {
+            super.dismiss(animated: flag) {
+                self.isPanDismiss = false
+                completion?()
+            }
+        }
+        else {
+            self.willDismiss?(self)
+            super.dismiss(animated: flag) {
+                self.didDismiss?(self)
+                completion?()
+            }
         }
     }
     
@@ -338,6 +349,10 @@ public class SheetViewController: UIViewController {
         let maxHeight = max(self.height(for: self.actualContainerSize), self.height(for: self.orderedSheetSizes.last))
         
         var newHeight = max(0, self.height(for: self.actualContainerSize) + (self.firstPanPoint.y - point.y))
+        /// This is for not expand the sheet
+        if newHeight > self.height(for: self.actualContainerSize){
+            newHeight = self.height(for: self.actualContainerSize)
+        }
         var offset: CGFloat = 0
         if newHeight < minHeight {
             offset = minHeight - newHeight
@@ -368,6 +383,7 @@ public class SheetViewController: UIViewController {
                     self?.containerView.transform = CGAffineTransform(translationX: 0, y: self?.containerView.frame.height ?? 0)
                     self?.view.backgroundColor = UIColor.clear
                 }, completion: { [weak self] complete in
+                    self?.isPanDismiss = true
                     self?.dismiss(animated: false, completion: nil)
                 })
                 return
