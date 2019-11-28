@@ -392,14 +392,14 @@ public class SheetViewController: UIViewController {
             var newSize = self.containerSize
             if point.y < 0 {
                 // We need to move to the next larger one
-                newSize = self.orderedSheetSizes.last ?? self.containerSize
-                for size in self.orderedSheetSizes.reversed() {
-                    if finalHeight < self.height(for: size) {
-                        newSize = size
-                    } else {
-                        break
-                    }
-                }
+//                newSize = self.orderedSheetSizes.last ?? self.containerSize
+//                for size in self.orderedSheetSizes.reversed() {
+//                    if finalHeight < self.height(for: size) {
+//                        newSize = size
+//                    } else {
+//                        break
+//                    }
+//                }
             } else {
                 // We need to move to the next smaller one
                 newSize = self.orderedSheetSizes.first ?? self.containerSize
