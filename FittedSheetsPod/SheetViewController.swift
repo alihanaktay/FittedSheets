@@ -74,6 +74,8 @@ public class SheetViewController: UIViewController {
     public var willDismiss: ((SheetViewController) -> Void)?
     public var didDismiss: ((SheetViewController) -> Void)?
     
+    public var didDismissWithGesture: ((SheetViewController) -> Void)?
+
     // MARK: - Private properties
     /// The pan gesture dismiss
     private var isPanDismiss: Bool = false
@@ -325,6 +327,9 @@ public class SheetViewController: UIViewController {
     override public func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         if isPanDismiss {
             super.dismiss(animated: flag) {
+                if let gestureDissmissCalback = self.didDismissWithGesture {
+                 gestureDissmissCalback(self)
+                }
                 self.isPanDismiss = false
                 completion?()
             }
